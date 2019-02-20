@@ -90,7 +90,7 @@ function Markdown(runner) {
     httpInTest = nock.recorder.play()
     let code = utils.clean(test.body);
     const mdx = `
-# ${test.title}
+### ${test.title}
 <DemoBlock 
   code ={${JSON.stringify(code)}} 
   http={${JSON.stringify(httpInTest)}}
