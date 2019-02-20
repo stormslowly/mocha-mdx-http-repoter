@@ -1,0 +1,19 @@
+{
+  "name": "mocha-mdx-http-reporter",
+  "version": "0.0.1",
+  "description": "",
+  "main": "mdx-reporter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@compositor/x0": "^6.0.7",
+    "cp": "^0.2.0",
+    "mkdirp": "^0.5.1",
+    "mocha": "^6.0.0",
+    "nock": "^10.0.6"
+  }
+}
