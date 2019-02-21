@@ -10,20 +10,6 @@ const cpy = require('cpx').copySync
 exports = module.exports = Markdown;
 
 const SUITE_PREFIX = '$';
-const CODE_BEG = "```"
-const CODE_END = "```"
-
-function wrapCode(code, syntax = 'javascript') {
-  return `
-${CODE_BEG}${syntax}
-
-${code}
-
-${CODE_BEG}
-
-`
-}
-
 
 function Markdown(runner) {
   Base.call(this, runner);
@@ -136,14 +122,10 @@ import DemoBlock from './DemoBlock'
     }
 
     mkdirp(reportBase)
-    // process.stdout.write(mdxHeader);
-    // process.stdout.write('# TOC\n');
-    // process.stdout.write(generateTOC(runner.suite));
-    // process.stdout.write(buf);
 
     writeReport()
 
-    cpy(path.join(__dirname, 'component',"*.js"), reportBase);
+    cpy(path.join(__dirname, 'component', "*.js"), reportBase);
 
     console.error('Done')
     console.error('check reporter with', `\nnpx x0 -p 9991 ${reportBase}`)
