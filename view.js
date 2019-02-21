@@ -10,7 +10,7 @@ const readPkg = require('read-pkg-up').sync
 
 
 const config = require('pkg-conf').sync('x0')
-const pkg = readPkg().pkg
+const pkg = readPkg({cwd: __dirname}).pkg
 
 const dev = require('@compositor/x0/lib/dev')
 

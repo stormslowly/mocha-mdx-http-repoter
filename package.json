@@ -7,7 +7,7 @@
     "view-doc": "view.js"
   },
   "scripts": {
-    "view-doc": "view.js"
+    "view-doc": "./view.js"
   },
   "keywords": [],
   "author": "",
