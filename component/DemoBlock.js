@@ -7,7 +7,7 @@ export default ({code, http}) => {
 
   return <div style={{display: "flex", justifyContent: "space-between"}}>
 
-    <div style={{display: "flex", flex: 1}}>
+    <div style={{display: "flex", flex: 1, overflow: 'scroll'}}>
       <Snippet code={code}/>
     </div>
 
