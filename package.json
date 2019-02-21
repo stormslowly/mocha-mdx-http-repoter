@@ -1,6 +1,6 @@
 {
   "name": "mocha-mdx-http-reporter",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "",
   "main": "mdx-reporter.js",
   "bin": {
@@ -14,6 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "@compositor/x0": "^6.0.7",
+    "babel-preset-es2015": "^6.24.1",
     "cp": "^0.2.0",
     "cpx": "^1.5.0",
     "meow": "^5.0.0",
