@@ -5,6 +5,8 @@ const cp = require('cp').sync
 const nock = require('nock')
 const path = require('path')
 const fs = require('fs')
+const cpy = require('cpx').copySync
+
 
 exports = module.exports = Markdown;
 
@@ -142,9 +144,7 @@ import DemoBlock from './DemoBlock'
 
     writeReport()
 
-    cp(path.join(__dirname, 'component', 'DemoBlock.js'), path.join(reportBase, 'DemoBlock.js'))
-    cp(path.join(__dirname, 'component', 'HttpInspector.js'), path.join(reportBase, 'HttpInspector.js'))
-    cp(path.join(__dirname, 'component', 'Snippet.js'), path.join(reportBase, 'Snippet.js'))
+    cpy(path.join(__dirname, 'component',"*.js"), reportBase);
 
     console.error('Done')
     console.error('check reporter with', `\nnpx x0 -p 9991 ${reportBase}`)
