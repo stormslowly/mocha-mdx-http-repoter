@@ -1,7 +1,6 @@
 const Base = require('mocha/lib/reporters/base')
 const utils = require('mocha/lib/utils');
 const mkdirp = require('mkdirp').sync;
-const cp = require('cp').sync
 const nock = require('nock')
 const path = require('path')
 const fs = require('fs')
