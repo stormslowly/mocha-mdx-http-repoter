@@ -7,11 +7,39 @@ const fs = require('fs')
 const cpy = require('cpx').copySync
 
 
-exports = module.exports = Markdown;
+exports = module.exports = MdxReporter;
 
 const SUITE_PREFIX = '$';
 
-function Markdown(runner) {
+
+class TestReport {
+  constructor(test, httpInTest) {
+    this.test = test
+    this.http = httpInTest
+  }
+}
+
+
+class Suite {
+  constructor(slug, parent) {
+    this.slug = slug
+    this.parent = parent
+
+    this.childSuites = []
+    this.testReports = []
+  }
+
+  addSuite(suite) {
+    this.childSuites.push(suite)
+  }
+
+  addTestReport(report) {
+    this.testReports.push(report)
+  }
+}
+
+
+function MdxReporter(runner, reportWriter) {
   Base.call(this, runner);
 
   let level = 0;
@@ -19,13 +47,17 @@ function Markdown(runner) {
   let httpInTest = []
 
 
+  let suites = []
+
+  let currentSuite = null
+
   function title(str) {
     return Array(level).join('#') + ' ' + str;
   }
 
   function mapTOC(suite, obj) {
-    var ret = obj;
-    var key = SUITE_PREFIX + suite.title;
+    const ret = obj;
+    const key = SUITE_PREFIX + suite.title;
 
     obj = obj[key] = obj[key] || {suite: suite};
     suite.suites.forEach(function (suite) {
@@ -37,8 +69,8 @@ function Markdown(runner) {
 
   function stringifyTOC(obj, level) {
     ++level;
-    var buf = '';
-    var link;
+    let buf = '';
+    let link;
     for (var key in obj) {
       if (key === 'suite') {
         continue;
@@ -54,22 +86,30 @@ function Markdown(runner) {
   }
 
   function generateTOC(suite) {
-    var obj = mapTOC(suite, {});
+    const obj = mapTOC(suite, {});
     return stringifyTOC(obj, 0);
   }
 
-  generateTOC(runner.suite);
-
   runner.on('suite', function (suite) {
-    ++level;
+
     let slug = utils.slug(suite.fullTitle());
+    if (level === 0) {
+      const s = new Suite(slug)
+      currentSuite = s
+      suites.push(s)
+    } else {
+      const childSuite = new Suite(slug, currentSuite)
+      currentSuite.addSuite(childSuite)
+      currentSuite = childSuite
+    }
+    ++level;
     buf += '<a name="' + slug + '"></a>' + '\n';
     buf += title(suite.title) + '\n';
-
   });
 
   runner.on('suite end', function () {
     --level;
+    currentSuite = currentSuite.parent
   });
 
   runner.on('pass', function (test) {
@@ -85,6 +125,7 @@ function Markdown(runner) {
 
 `
     buf += mdx
+    currentSuite.addTestReport(new TestReport(test, httpInTest))
   });
 
   runner.on('fail', (test, err) => {
@@ -92,14 +133,10 @@ function Markdown(runner) {
   })
 
   runner.on('test', (test) => {
-    console.error("test start", test.title)
     httpInTest = []
-
   })
 
   runner.on('test end', (test) => {
-
-    console.error("test end", test.title)
     nock.recorder.clear()
   })
 
@@ -111,24 +148,26 @@ import DemoBlock from './DemoBlock'
 `
   runner.once('end', function () {
 
+    nock.restore()
+
     const reportBase = path.join(process.cwd(), 'mdxreport')
 
 
-    function writeReport() {
+    function writeReport(toDir) {
 
-      fs.writeFileSync(path.join(reportBase, 'index.mdx'),
+      fs.writeFileSync(path.join(toDir, 'index.mdx'),
         [mdxHeader, '# TOC\n', generateTOC(runner.suite), buf].join('\n')
       )
+      console.error('Done')
+      console.error('check reporter with', `\nnpx x0 -p 9991 ${reportBase}`)
     }
 
+    const writer = reportWriter || writeReport
+
     mkdirp(reportBase)
-
-    writeReport()
-
     cpy(path.join(__dirname, 'component', "*.js"), reportBase);
 
-    console.error('Done')
-    console.error('check reporter with', `\nnpx x0 -p 9991 ${reportBase}`)
+    writer(reportBase, suites)
   });
 }
 
