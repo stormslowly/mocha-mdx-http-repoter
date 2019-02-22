@@ -4,8 +4,12 @@
   "description": "",
   "main": "mdx-reporter.js",
   "keywords": [],
-  "author": "",
+  "author": "stormslowly",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/stormslowly/mocha-mdx-http-repoter.git"
+  },
   "scripts": {
     "test": "mocha"
   },
