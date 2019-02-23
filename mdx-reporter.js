@@ -5,38 +5,12 @@ const nock = require('nock')
 const path = require('path')
 const fs = require('fs')
 const cpy = require('cpx').copySync
-
+const TestReport = require('./lib/testReport')
+const Suite = require('./lib/suite')
 
 exports = module.exports = MdxReporter;
 
 const SUITE_PREFIX = '$';
-
-
-class TestReport {
-  constructor(test, httpInTest) {
-    this.test = test
-    this.http = httpInTest
-  }
-}
-
-
-class Suite {
-  constructor(slug, parent) {
-    this.slug = slug
-    this.parent = parent
-
-    this.childSuites = []
-    this.testReports = []
-  }
-
-  addSuite(suite) {
-    this.childSuites.push(suite)
-  }
-
-  addTestReport(report) {
-    this.testReports.push(report)
-  }
-}
 
 
 function MdxReporter(runner, reportWriter) {
@@ -46,10 +20,9 @@ function MdxReporter(runner, reportWriter) {
   let buf = '';
   let httpInTest = []
 
+  const topSuite = new Suite('', null)
 
-  let suites = []
-
-  let currentSuite = null
+  let currentSuite = topSuite
 
   function title(str) {
     return Array(level).join('#') + ' ' + str;
@@ -93,15 +66,11 @@ function MdxReporter(runner, reportWriter) {
   runner.on('suite', function (suite) {
 
     let slug = utils.slug(suite.fullTitle());
-    if (level === 0) {
-      const s = new Suite(slug)
-      currentSuite = s
-      suites.push(s)
-    } else {
-      const childSuite = new Suite(slug, currentSuite)
-      currentSuite.addSuite(childSuite)
-      currentSuite = childSuite
-    }
+
+    const s = new Suite(slug, currentSuite)
+    currentSuite.addSuite(s)
+    currentSuite = s
+
     ++level;
     buf += '<a name="' + slug + '"></a>' + '\n';
     buf += title(suite.title) + '\n';
@@ -115,17 +84,9 @@ function MdxReporter(runner, reportWriter) {
   runner.on('pass', function (test) {
 
     httpInTest = nock.recorder.play()
-    let code = utils.clean(test.body);
-    const mdx = `
-### ${test.title}
-<DemoBlock 
-  code ={${JSON.stringify(code)}} 
-  http={${JSON.stringify(httpInTest)}}
-/>
-
-`
-    buf += mdx
-    currentSuite.addTestReport(new TestReport(test, httpInTest))
+    const tr = new TestReport(test, httpInTest)
+    buf += tr.toMdx()
+    currentSuite.addTestReport(tr)
   });
 
   runner.on('fail', (test, err) => {
@@ -167,7 +128,7 @@ import DemoBlock from './DemoBlock'
     mkdirp(reportBase)
     cpy(path.join(__dirname, 'component', "*.js"), reportBase);
 
-    writer(reportBase, suites)
+    writer(reportBase, topSuite)
   });
 }
 

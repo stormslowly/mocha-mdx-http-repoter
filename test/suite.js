@@ -1,6 +1,7 @@
 const {expect} = require('chai')
 const EventEmitter = require('events')
 const MdxReporter = require('../mdx-reporter')
+const mockTest = require("./helper").mockTest;
 
 describe('Mdx-reporter', () => {
   let suiteIndex = 0
@@ -11,11 +12,11 @@ describe('Mdx-reporter', () => {
       return `fullTitle ${suiteIndex++}`
     }
   }
-  let suites = []
+  let suite
   let runner = null
 
-  const reportWriter = (toDir, suitesInTest) => {
-    suites = suitesInTest
+  const reportWriter = (toDir, suiteInTest) => {
+    suite = suiteInTest
   }
 
   beforeEach(() => {
@@ -41,12 +42,7 @@ describe('Mdx-reporter', () => {
 
 
   function runTest() {
-    const currentTest = {
-      title: `test ${testIndex++}`,
-      body: `console.log(${testIndex})`,
-      slow() {
-      }
-    }
+    const currentTest = mockTest(testIndex)
     runner.emit('test', currentTest)
     runner.emit('pass', currentTest)
     runner.emit('test end', currentTest)
@@ -58,7 +54,7 @@ describe('Mdx-reporter', () => {
 
     allEnd()
 
-    expect(suites).to.have.length(1)
+    expect(suite.childSuites).to.have.length(1)
   })
 
   it(`2 suites run `, () => {
@@ -69,7 +65,7 @@ describe('Mdx-reporter', () => {
     endSuite()
 
     allEnd()
-    expect(suites).to.have.length(2)
+    expect(suite.childSuites).to.have.length(2)
   })
 
   it(`nested suite run `, () => {
@@ -80,8 +76,8 @@ describe('Mdx-reporter', () => {
 
     allEnd()
 
-    expect(suites).to.have.length(1)
-    expect(suites[0].childSuites).to.have.length(1)
+    expect(suite.childSuites).to.have.length(1)
+    expect(suite.childSuites[0].childSuites).to.have.length(1)
   })
 
   it(`run a test `, () => {
@@ -91,6 +87,6 @@ describe('Mdx-reporter', () => {
 
     allEnd()
 
-    expect(suites).to.have.length(1)
+    expect(suite.childSuites).to.have.length(1)
   })
 })
