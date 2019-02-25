@@ -25,7 +25,7 @@ describe('Mdx-reporter', () => {
     testIndex = 0
     suites = []
     runner = new EventEmitter()
-    new MdxReporter(runner, reportWriter)
+    new MdxReporter(runner, null, reportWriter)
   })
 
 

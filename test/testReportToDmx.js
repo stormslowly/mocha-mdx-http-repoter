@@ -9,7 +9,9 @@ describe('MdxReport', () => {
     const tr = new TestReport(mockTest(), [])
 
     expect(tr.toMdx()).to.equal(`
+
 ### test 42
+
 <DemoBlock 
   code ={"console.log(42)"} 
   http={[]}

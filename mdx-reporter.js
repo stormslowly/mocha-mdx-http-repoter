@@ -13,7 +13,7 @@ exports = module.exports = MdxReporter;
 const SUITE_PREFIX = '$';
 
 
-function MdxReporter(runner, reportWriter) {
+function MdxReporter(runner, _, reportWriter) {
   Base.call(this, runner);
 
   let level = 0;
@@ -72,7 +72,7 @@ function MdxReporter(runner, reportWriter) {
     currentSuite = s
 
     ++level;
-    buf += '<a name="' + slug + '"></a>' + '\n';
+    buf += '<a name="' + slug + '"></a>' + '\n\n';
     buf += title(suite.title) + '\n';
   });
 
@@ -93,7 +93,8 @@ function MdxReporter(runner, reportWriter) {
     console.error('fail', test, err.message)
   })
 
-  runner.on('test', (test) => {
+  runner.on('test', () => {
+    nock.recorder.clear()
     httpInTest = []
   })
 
@@ -114,7 +115,7 @@ import DemoBlock from './DemoBlock'
     const reportBase = path.join(process.cwd(), 'mdxreport')
 
 
-    function writeReport(toDir) {
+    function defaultReporter(toDir) {
 
       fs.writeFileSync(path.join(toDir, 'index.mdx'),
         [mdxHeader, '# TOC\n', generateTOC(runner.suite), buf].join('\n')
@@ -123,7 +124,7 @@ import DemoBlock from './DemoBlock'
       console.error('check reporter with', `\nnpx x0 -p 9991 ${reportBase}`)
     }
 
-    const writer = reportWriter || writeReport
+    const writer = reportWriter || defaultReporter
 
     mkdirp(reportBase)
     cpy(path.join(__dirname, 'component', "*.js"), reportBase);
