@@ -10,7 +10,8 @@ describe('Mdx-reporter', () => {
   const suiteObject = {
     fullTitle() {
       return `fullTitle ${suiteIndex++}`
-    }
+    },
+    title: `title ${suiteIndex++}`
   }
   let suite
   let runner = null
