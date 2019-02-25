@@ -20,7 +20,7 @@ function MdxReporter(runner, _, reportWriter) {
   let buf = '';
   let httpInTest = []
 
-  const topSuite = new Suite('', null)
+  const topSuite = new Suite({}, null)
 
   let currentSuite = topSuite
 
@@ -65,9 +65,10 @@ function MdxReporter(runner, _, reportWriter) {
 
   runner.on('suite', function (suite) {
 
-    let slug = utils.slug(suite.fullTitle());
+    const slug = utils.slug(suite.fullTitle());
+    const suiteTitle = suite.title
 
-    const s = new Suite(slug, currentSuite)
+    const s = new Suite({slug, title: suiteTitle}, currentSuite)
     currentSuite.addSuite(s)
     currentSuite = s
 
@@ -117,9 +118,13 @@ import DemoBlock from './DemoBlock'
 
     function defaultReporter(toDir) {
 
+      const s = topSuite.childSuites[0]
+
       fs.writeFileSync(path.join(toDir, 'index.mdx'),
-        [mdxHeader, '# TOC\n', generateTOC(runner.suite), buf].join('\n')
+        [mdxHeader, '# TOC\n', s.toToc(), s.toMdx(0, true)].join('\n')
       )
+      console.log(topSuite.childSuites)
+
       console.error('Done')
       console.error('check reporter with', `\nnpx x0 -p 9991 ${reportBase}`)
     }
