@@ -1,6 +1,6 @@
 {
   "name": "mocha-mdx-http-reporter",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "",
   "main": "mdx-reporter.js",
   "keywords": [],
