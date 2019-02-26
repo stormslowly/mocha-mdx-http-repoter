@@ -22,13 +22,12 @@ describe('Suite', () => {
 
     expect(suTSuite.index()).to.equal(
       `
-# title1
+ [title1](/slug_suite_1)
 
-# title2`
-    );
+ [title2](/slug_suite_2)`);
   })
 
   it('to Mdx', () => {
-    console.log(suTSuite.toMdx(0, true));
+    //console.log(suTSuite.toMdx(0, true));
   })
 })

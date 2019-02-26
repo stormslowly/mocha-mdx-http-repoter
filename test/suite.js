@@ -55,30 +55,19 @@ describe('Mdx-reporter', () => {
 
     allEnd()
 
-    expect(suite.childSuites).to.have.length(1)
+    expect(suite.childSuites).to.have.length(0)
   })
 
   it(`2 suites run `, () => {
     startSuite()
-    endSuite()
 
     startSuite()
     endSuite()
 
-    allEnd()
-    expect(suite.childSuites).to.have.length(2)
-  })
-
-  it(`nested suite run `, () => {
-    startSuite()
-    startSuite()
     endSuite()
-    endSuite()
-
     allEnd()
 
     expect(suite.childSuites).to.have.length(1)
-    expect(suite.childSuites[0].childSuites).to.have.length(1)
   })
 
   it(`run a test `, () => {
@@ -88,6 +77,6 @@ describe('Mdx-reporter', () => {
 
     allEnd()
 
-    expect(suite.childSuites).to.have.length(1)
+    expect(suite.testReports).to.have.length(1)
   })
 })
